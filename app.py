@@ -15,7 +15,7 @@ st.set_page_config(page_title="Employee Attrition Analysis", layout="wide")
 st.sidebar.title("Dataset")
 
 try:
-    df = pd.read_csv("HR_Cleaned.csv")
+    df = pd.read_csv("cleaned_hr_data.csv")
     st.sidebar.success("Default dataset loaded")
 except:
     uploaded_file = st.sidebar.file_uploader("Upload Dataset", type=["csv"])
@@ -102,6 +102,11 @@ if page == "Summary & KPIs":
 elif page == "Visualizations":
 
     st.title("Attrition Analysis Visualizations")
+    st.markdown("""
+## 📊 Key Insights Summary
+
+This dashboard analyzes employee attrition patterns based on multiple factors such as salary, department, overtime, and satisfaction levels.
+""")
 
     # Q1 Attrition percentage
     st.subheader("Q1 Employee Attrition Percentage")
@@ -115,10 +120,14 @@ elif page == "Visualizations":
                  title="Attrition Percentage")
 
     st.plotly_chart(fig,use_container_width=True)
-    st.info(
-    "📊 Insight: Around 16% of employees have left, while 84% stayed. "
-    "Attrition is moderate but important for business decisions."
-)
+    total = attr["Count"].sum()
+    left = attr[attr["Status"]=="Left"]["Count"].values[0]
+    rate = round((left / total) * 100, 2)
+
+    st.info(f"📊 Insight: Approximately {rate}% employees have left the company."
+            f"while {100-rate}% have stayed. This indicates a moderate level of attrition.")
+    
+    st.write("")  # spacing
 
     # Q2 Department attrition
     st.subheader("Q2 Department with Highest Attrition")
@@ -129,9 +138,11 @@ elif page == "Visualizations":
                  color="Department")
 
     st.plotly_chart(fig,use_container_width=True)
+    top_dept = dept.sort_values(by="Attrition", ascending=False).iloc[0]
     st.info(
-    "📊 Insight: Sales department shows the highest attrition. "
-    "Retention strategies should focus here."
+    f"📊 Insight: {top_dept['Department']} has the highest attrition rate "
+    f"at {round(top_dept['Attrition']*100,2)}%, suggesting retention efforts "
+    "should focus on this department."
 )
 
     # Q3 Salary vs attrition
@@ -143,9 +154,10 @@ elif page == "Visualizations":
                  color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    avg_salary = filtered_df.groupby("Attrition")["MonthlyIncome"].mean()
     st.info(
-    "📊 Insight: Employees who leave tend to have lower salaries. "
-    "Compensation is a key factor."
+    f"📊 Insight: Employees who left earn an average of ₹{int(avg_salary[1])}, "
+    f"while those who stayed earn ₹{int(avg_salary[0])}. Lower income is associated with higher attrition."
 )
 
     # Q4 Overtime effect
@@ -157,9 +169,13 @@ elif page == "Visualizations":
                        barmode="group")
 
     st.plotly_chart(fig,use_container_width=True)
+    ot = pd.crosstab(filtered_df["OverTime"], filtered_df["Attrition"], normalize="index")*100
+
+    if "Yes" in ot.index:
+     rate_ot = round(ot.loc["Yes",1],2)
     st.info(
-    "📊 Insight: Overtime workers show much higher attrition. "
-    "Workload is a major issue."
+    f"📊 Insight: {rate_ot}% of employees who work overtime leave the company, "
+        "indicating that excessive workload significantly increases attrition risk."
 )
 
     # Q5 Age group attrition
@@ -170,9 +186,11 @@ elif page == "Visualizations":
                        color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    age_data = pd.crosstab(filtered_df["AgeGroup"], filtered_df["Attrition"])
+    top_age = age_data[1].idxmax()
     st.info(
-    "📊 Insight: Employees aged 26–35 leave the most. "
-    "Likely due to career growth and better opportunities."
+    f"📊 Insight: Employees in the {top_age} age group have the highest attrition, "
+    "likely due to career growth opportunities and job switching."
 )
 
     # Q6 Distance from home
@@ -184,9 +202,11 @@ elif page == "Visualizations":
                  color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    dist = filtered_df.groupby("Attrition")["DistanceFromHome"].mean()
     st.info(
-    "📊 Insight: Employees living farther away are more likely to leave. "
-    "Commute impacts retention."
+    f"📊 Insight: Employees who left live farther away (avg: {round(dist[1],2)}) "
+    f"compared to those who stayed (avg: {round(dist[0],2)}). "
+    "Longer commute distance contributes to attrition."
 )
 
     # Q7 Job Satisfaction
@@ -197,8 +217,11 @@ elif page == "Visualizations":
                        color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    sat = filtered_df.groupby("Attrition")["JobSatisfaction"].mean()
     st.info(
-    "📊 Insight: Lower job satisfaction strongly correlates with attrition."
+    f"📊 Insight: Employees who left have lower job satisfaction "
+    f"({round(sat[1],2)}) compared to those who stayed ({round(sat[0],2)}), "
+    "indicating dissatisfaction drives attrition."
 )
 
     # Q8 Work Life Balance
@@ -209,8 +232,11 @@ elif page == "Visualizations":
                        color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    wlb = filtered_df.groupby("Attrition")["WorkLifeBalance"].mean()
     st.info(
-    "📊 Insight: Poor work-life balance leads to higher attrition."
+    f"📊 Insight: Employees who left report lower work-life balance "
+    f"({round(wlb[1],2)}) than those who stayed ({round(wlb[0],2)}). "
+    "Poor balance contributes to employee turnover."
 )
 
     # Q9 Correlation
@@ -225,7 +251,8 @@ elif page == "Visualizations":
 
     st.plotly_chart(fig,use_container_width=True)
     st.info(
-    "📊 Insight: Multiple factors like salary, satisfaction, overtime, and distance influence attrition."
+    "📊 Insight: Most variables show weak correlation with Attrition, "
+    "indicating that employee turnover is influenced by multiple factors rather than a single dominant variable."
 )
 
     # Q10 Key Factors
@@ -240,6 +267,18 @@ elif page == "Visualizations":
     ]].mean()
 
     st.dataframe(factors)
+    st.markdown("""
+### 📌 Conclusion  
+Key factors influencing attrition include:
+
+- Lower **Monthly Income**
+- Lower **Job Satisfaction**
+- Poor **Work-Life Balance**
+- Higher **Distance from Home**
+- Younger employees (especially 26–35)
+
+These variables can be used to build predictive models.
+""")
 
 # =====================================================
 # PAGE 3 : PREDICTION
