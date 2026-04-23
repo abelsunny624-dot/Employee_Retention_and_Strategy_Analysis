@@ -115,6 +115,10 @@ elif page == "Visualizations":
                  title="Attrition Percentage")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Around 16% of employees have left, while 84% stayed. "
+    "Attrition is moderate but important for business decisions."
+)
 
     # Q2 Department attrition
     st.subheader("Q2 Department with Highest Attrition")
@@ -125,6 +129,10 @@ elif page == "Visualizations":
                  color="Department")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Sales department shows the highest attrition. "
+    "Retention strategies should focus here."
+)
 
     # Q3 Salary vs attrition
     st.subheader("Q3 Salary Impact on Attrition")
@@ -135,6 +143,10 @@ elif page == "Visualizations":
                  color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Employees who leave tend to have lower salaries. "
+    "Compensation is a key factor."
+)
 
     # Q4 Overtime effect
     st.subheader("Q4 Overtime vs Attrition")
@@ -145,6 +157,10 @@ elif page == "Visualizations":
                        barmode="group")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Overtime workers show much higher attrition. "
+    "Workload is a major issue."
+)
 
     # Q5 Age group attrition
     st.subheader("Q5 Attrition by Age Group")
@@ -154,6 +170,10 @@ elif page == "Visualizations":
                        color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Employees aged 26–35 leave the most. "
+    "Likely due to career growth and better opportunities."
+)
 
     # Q6 Distance from home
     st.subheader("Q6 Distance from Home vs Attrition")
@@ -164,6 +184,10 @@ elif page == "Visualizations":
                  color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Employees living farther away are more likely to leave. "
+    "Commute impacts retention."
+)
 
     # Q7 Job Satisfaction
     st.subheader("Q7 Job Satisfaction vs Attrition")
@@ -173,6 +197,9 @@ elif page == "Visualizations":
                        color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Lower job satisfaction strongly correlates with attrition."
+)
 
     # Q8 Work Life Balance
     st.subheader("Q8 Work Life Balance vs Attrition")
@@ -182,6 +209,9 @@ elif page == "Visualizations":
                        color="Attrition")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Poor work-life balance leads to higher attrition."
+)
 
     # Q9 Correlation
     st.subheader("Q9 Correlation Heatmap")
@@ -194,6 +224,9 @@ elif page == "Visualizations":
                     title="Correlation Matrix")
 
     st.plotly_chart(fig,use_container_width=True)
+    st.info(
+    "📊 Insight: Multiple factors like salary, satisfaction, overtime, and distance influence attrition."
+)
 
     # Q10 Key Factors
     st.subheader("Q10 Key Factors Affecting Attrition")
