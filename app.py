@@ -76,7 +76,7 @@ page = st.sidebar.radio(
 
 if page == "Summary & KPIs":
 
-    st.title("Employee Attrition Dashboard")
+    st.title("Employee Retention and Strategy Analysis Dashboard")
 
     total_emp = len(filtered_df)
     left_emp = filtered_df["Attrition"].sum()
