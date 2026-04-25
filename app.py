@@ -1,3 +1,103 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+st.set_page_config(page_title="Employee Attrition Analysis", layout="wide")
+
+# -----------------------------------------------------
+# DATA LOADING
+# -----------------------------------------------------
+
+st.sidebar.title("Dataset")
+
+try:
+    df = pd.read_csv("cleaned_hr_data.csv")
+    st.sidebar.success("Default dataset loaded")
+except:
+    uploaded_file = st.sidebar.file_uploader("Upload Dataset", type=["csv"])
+    if uploaded_file:
+        df = pd.read_csv(uploaded_file)
+    else:
+        st.warning("Please upload dataset to continue")
+        st.stop()
+
+# -----------------------------------------------------
+# DATA PREPROCESSING
+# -----------------------------------------------------
+
+if "Attrition" in df.columns:
+    if df["Attrition"].dtype == object:
+        df["Attrition"] = df["Attrition"].map({"Yes":1,"No":0})
+
+# Age groups
+bins = [18,25,35,45,55,60]
+labels = ['18-25','26-35','36-45','46-55','56+']
+df['AgeGroup'] = pd.cut(df['Age'], bins=bins, labels=labels)
+
+# -----------------------------------------------------
+# SIDEBAR FILTERS
+# -----------------------------------------------------
+
+st.sidebar.title("Filters")
+
+department = st.sidebar.multiselect(
+    "Department",
+    df["Department"].unique(),
+    default=df["Department"].unique()
+)
+
+overtime = st.sidebar.multiselect(
+    "Overtime",
+    df["OverTime"].unique(),
+    default=df["OverTime"].unique()
+)
+
+filtered_df = df[
+    (df["Department"].isin(department)) &
+    (df["OverTime"].isin(overtime))
+]
+
+# -----------------------------------------------------
+# PAGE NAVIGATION
+# -----------------------------------------------------
+
+page = st.sidebar.radio(
+    "Navigation",
+    ["Summary & KPIs","Visualizations","Prediction"]
+)
+
+# =====================================================
+# PAGE 1 : SUMMARY + KPI
+# =====================================================
+
+if page == "Summary & KPIs":
+
+    st.title("Employee Retention and Strategy Analysis Dashboard")
+
+    total_emp = len(filtered_df)
+    left_emp = filtered_df["Attrition"].sum()
+    attrition_rate = round(left_emp/total_emp*100,2)
+
+    col1,col2,col3 = st.columns(3)
+
+    col1.metric("Total Employees", total_emp)
+    col2.metric("Employees Left", left_emp)
+    col3.metric("Attrition Rate %", attrition_rate)
+
+    st.subheader("Summary Statistics")
+
+    st.dataframe(filtered_df.describe())
+
+    st.subheader("Dataset Preview")
+    st.dataframe(filtered_df.head())
+
+# =====================================================
+# PAGE 2 : VISUALIZATIONS
+# =====================================================
 elif page == "Visualizations":
 
     st.title("Employee Attrition Insights")
